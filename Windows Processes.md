@@ -65,10 +65,7 @@ The entry will also include **svchost.exe -k \<name>**
 >**Hunting tip:** They will inject into the process, spawn malware named as explorer.exe, run it from a different folder or misspell it and have it run from the actual folder. Look for instances where explorer has CMD hanging off it or is listening/connected on a network port.    
    
 
-#   
-#  
-#   
- 
+<br><br>
 
  >![alt text](images/image-7.png)
  >![alt text](images/image-6.png)
