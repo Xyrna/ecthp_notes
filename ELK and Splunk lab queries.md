@@ -119,6 +119,7 @@ Once the query is executed, we'll get the following match:
 ```
 winlog.event_id:(4798 OR 4799) AND winlog.event_data.CallerProcessName:(net OR net1)
 ```
+<br>
 
 ## Hunt for Persistence through Accessibility Features
 
@@ -141,6 +142,7 @@ Reviewing the information available in T1015, we assemble the following list of 
 ```
 winlog.event_data.Image:("C:\Windows\System32\osk.exe" OR "C:\Windows\System32\sethc.exe" OR "C:\Windows\System32\utilman.exe" OR "C:\Windows\System32\magnify.exe" OR "C:\Windows\System32\narrator.exe" OR "C:\Windows\System32\displayswitch.exe" OR "C:\Windows\System32\atbroker.exe") AND winlog.event_data.Description:"Windows Command Processor" AND winlog.event_data.User:"NT AUTHORITY\SYSTEM"
 ```
+<br>
 
 ## Hunt for Privilege Escalation through Scheduled tasks
 
