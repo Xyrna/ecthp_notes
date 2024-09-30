@@ -106,4 +106,76 @@ event.id:1 AND ((process.executable:schtasks.exe AND process.args:create) OR pro
 ```
 
 Once the query is executed, we'll get the following match:
+
 ![alt text](image-1.png)
+
+<br>
+
+## Perform a hunt for account discovery
+
+- 4798 -- A user's local group membership was enumerated
+- 4799 -- A security-enabled local group membership was enumerated
+
+```
+winlog.event_id:(4798 OR 4799) AND winlog.event_data.CallerProcessName:(net OR net1)
+```
+
+## Hunt for Persistence through Accessibility Features
+
+Reviewing the information available in T1015, we assemble the following list of targeted executables:
+
+- Sethc.exe
+
+- Utilman.exe
+
+- Osk.exe
+
+- Magnify.exe
+
+- Narrator.exe
+
+- DisplaySwitch.exe
+
+- AtBroker.exe
+
+```
+winlog.event_data.Image:("C:\Windows\System32\osk.exe" OR "C:\Windows\System32\sethc.exe" OR "C:\Windows\System32\utilman.exe" OR "C:\Windows\System32\magnify.exe" OR "C:\Windows\System32\narrator.exe" OR "C:\Windows\System32\displayswitch.exe" OR "C:\Windows\System32\atbroker.exe") AND winlog.event_data.Description:"Windows Command Processor" AND winlog.event_data.User:"NT AUTHORITY\SYSTEM"
+```
+
+## Hunt for Privilege Escalation through Scheduled tasks
+
+Reading through the hinted document, we create a list of writable locations by all users, which is suspicious to run tasks from (remember to filter out known-good!). These locations are:
+
+- C:\users\*
+
+- C:\programdata\*
+
+- C:\Windows\Temp\*
+
+
+```
+winlog.event_id:1 AND winlog.event_data.Image:"C:\Windows\system32\schtasks.exe" AND winlog.event_data.CommandLine:("C:\users" OR "C:\programdata" OR "C:\Windows\Temp")
+```
+```
+winlog.event_data.TargetFilename:"C:\Windows\System32\Tasks\elevator"
+```
+```
+winlog.event_id:1 AND winlog.event_data.Image:"C:\Windows\system32\schtasks.exe" AND winlog.event_data.CommandLine:("run" AND "elevator")
+```
+
+```
+winlog.event_id:1 AND winlog.event_data.ParentImage:"taskeng.exe" AND winlog.event_data.Image:("cmd.exe" OR "wscript.exe" OR "rundll32.exe" OR "cscript.exe" OR "regsrv32.exe" OR "wmic.exe" OR "mshta.exe" OR "powershell.exe")
+```
+
+```
+winlog.event_id:1 AND winlog.event_data.Image:"C:\Windows\system32\schtasks.exe" AND winlog.event_data.CommandLine:("delete" AND "elevator")
+```
+<br>
+
+## Hunt for RDP over a Reverse SSH Tunnel
+
+By reviewing the hinted post, to discover this activity, we should be looking at Event ID 4624 (Successful logon) with Logon type 10 (indicating RDP).
+
+```
+winlog.event_id:4624 AND winlog.event_data.LogonType:10 AND winlog.event_data.IpAddress:"127.0.0.1" 
+```
